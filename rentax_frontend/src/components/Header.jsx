@@ -1,14 +1,14 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../authcontext";
 
 const Header = () => {
-  const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const role = localStorage.getItem("role");
+  const username = localStorage.getItem("username");
 
   const handleLogout = () => {
-    logout();
-    navigate("/");
+    localStorage.clear();
+    navigate("/login");
   };
 
   return (
@@ -16,9 +16,9 @@ const Header = () => {
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link
           to="/"
-          className="text-3xl font-extrabold text-gray-800 tracking-wide"
+          className="text-3xl font-extrabold text-gray-900 tracking-wide"
         >
-          RentaX
+          Rentax
         </Link>
         <nav className="space-x-6 flex items-center">
           <Link
@@ -33,15 +33,14 @@ const Header = () => {
           >
             Mobil
           </Link>
-          <Link
-            to="/booking"
-            className="text-gray-700 hover:text-yellow-600 font-semibold transition"
-          >
-            Booking
-          </Link>
-
-          {user ? (
+          {role === "user" && (
             <>
+              <Link
+                to="/booking"
+                className="text-gray-700 hover:text-yellow-600 font-semibold transition"
+              >
+                Booking
+              </Link>
               <Link
                 to="/my-bookings"
                 className="text-gray-700 hover:text-yellow-600 font-semibold transition"
@@ -49,13 +48,13 @@ const Header = () => {
                 Booking Saya
               </Link>
               <Link
-                to="/profile"
+                to="/dashboard"
                 className="text-gray-700 hover:text-yellow-600 font-semibold transition"
               >
-                Profil
+                Dashboard
               </Link>
               <span className="text-gray-800 font-semibold">
-                Halo, {user.username}
+                Halo, {username}
               </span>
               <button
                 onClick={handleLogout}
@@ -64,7 +63,39 @@ const Header = () => {
                 Logout
               </button>
             </>
-          ) : (
+          )}
+          {role === "admin" && (
+            <>
+              <Link
+                to="/admin"
+                className="text-gray-700 hover:text-yellow-600 font-semibold transition"
+              >
+                Admin Dashboard
+              </Link>
+              <Link
+                to="/admin/cars"
+                className="text-gray-700 hover:text-yellow-600 font-semibold transition"
+              >
+                Kelola Mobil
+              </Link>
+              <Link
+                to="/admin/bookings"
+                className="text-gray-700 hover:text-yellow-600 font-semibold transition"
+              >
+                Data Booking
+              </Link>
+              <span className="text-gray-800 font-semibold">
+                Halo, {username}
+              </span>
+              <button
+                onClick={handleLogout}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded shadow-md transition"
+              >
+                Logout
+              </button>
+            </>
+          )}
+          {!role && (
             <>
               <Link
                 to="/login"

@@ -1,80 +1,104 @@
 import React, { useState } from "react";
 
 const BookingForm = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    car: "",
-    startDate: "",
-    endDate: "",
+  const [form, setForm] = useState({
+    car_id: "",
+    start_date: "",
+    end_date: "",
+    total_price: "",
+    status: "active",
   });
+  const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+    setMessage("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(`Booking berhasil untuk ${formData.name} dengan mobil ${formData.car}`);
-    // Reset form
-    setFormData({ name: "", car: "", startDate: "", endDate: "" });
+
+    const username = localStorage.getItem("username");
+
+    try {
+      const res = await fetch("http://localhost:6543/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Role": "user",
+          "X-User": username,
+        },
+        body: JSON.stringify(form),
+      });
+      if (res.ok) {
+        setMessage("Booking berhasil dibuat!");
+        setForm({
+          car_id: "",
+          start_date: "",
+          end_date: "",
+          total_price: "",
+          status: "active",
+        });
+      } else {
+        setMessage("Booking gagal. Pastikan semua data valid!");
+      }
+    } catch {
+      setMessage("Terjadi kesalahan saat booking.");
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 font-sans flex items-center justify-center">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-full max-w-lg">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-900">Formulir Pemesanan</h2>
-
-        <label className="block mb-2 font-semibold text-gray-700">Nama Lengkap</label>
+    <div className="max-w-md mx-auto mt-10 bg-white p-8 rounded shadow">
+      <h2 className="text-2xl font-bold mb-4 text-center">Booking Mobil</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input
-          type="text"
-          name="name"
-          value={formData.name}
+          name="car_id"
+          value={form.car_id}
           onChange={handleChange}
-          className="border border-gray-300 rounded px-4 py-2 mb-4 w-full focus:outline-yellow-500"
+          className="w-full border p-2 rounded"
+          placeholder="ID Mobil"
           required
         />
-
-        <label className="block mb-2 font-semibold text-gray-700">Pilih Mobil</label>
-        <select
-          name="car"
-          value={formData.car}
-          onChange={handleChange}
-          className="border border-gray-300 rounded px-4 py-2 mb-4 w-full focus:outline-yellow-500"
-          required
-        >
-          <option value="">-- Pilih Mobil --</option>
-          <option value="Toyota Avanza">Toyota Avanza</option>
-          <option value="Honda Jazz">Honda Jazz</option>
-          <option value="Suzuki Ertiga">Suzuki Ertiga</option>
-        </select>
-
-        <label className="block mb-2 font-semibold text-gray-700">Tanggal Mulai</label>
         <input
+          name="start_date"
           type="date"
-          name="startDate"
-          value={formData.startDate}
+          value={form.start_date}
           onChange={handleChange}
-          className="border border-gray-300 rounded px-4 py-2 mb-4 w-full focus:outline-yellow-500"
+          className="w-full border p-2 rounded"
           required
         />
-
-        <label className="block mb-2 font-semibold text-gray-700">Tanggal Selesai</label>
         <input
+          name="end_date"
           type="date"
-          name="endDate"
-          value={formData.endDate}
+          value={form.end_date}
           onChange={handleChange}
-          className="border border-gray-300 rounded px-4 py-2 mb-6 w-full focus:outline-yellow-500"
+          className="w-full border p-2 rounded"
           required
         />
-
+        <input
+          name="total_price"
+          type="number"
+          value={form.total_price}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          placeholder="Total Harga"
+          required
+        />
         <button
           type="submit"
-          className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-6 py-3 rounded w-full transition"
+          className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 rounded"
         >
-          Pesan Sekarang
+          Booking
         </button>
       </form>
+      {message && (
+        <div className="mt-4 text-center text-green-600 font-semibold">
+          {message}
+        </div>
+      )}
     </div>
   );
 };

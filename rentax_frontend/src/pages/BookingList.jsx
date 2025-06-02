@@ -1,60 +1,64 @@
-import React, { useState } from "react";
-
-const initialBookings = [
-  { id: 1, car: "Toyota Avanza", status: "Berjalan", start: "2025-06-01", end: "2025-06-05" },
-  { id: 2, car: "Honda Jazz", status: "Selesai", start: "2025-05-10", end: "2025-05-12" },
-];
+import React, { useEffect, useState } from "react";
 
 const BookingList = () => {
-  const [bookings, setBookings] = useState(initialBookings);
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const username = localStorage.getItem("username");
 
-  const handleCancel = (id) => {
-    if (window.confirm("Batalkan booking ini?")) {
-      setBookings(bookings.map(b => b.id === id ? { ...b, status: "Batal" } : b));
-    }
-  };
+  useEffect(() => {
+    fetch("http://localhost:6543/api/bookings", {
+      headers: {
+        "X-Role": "user",
+        "X-User": username,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setBookings(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [username]);
 
   return (
-    <div className="min-h-screen max-w-5xl mx-auto p-8 bg-gray-50 font-sans">
-      <h1 className="text-3xl font-bold mb-6">Daftar Booking Saya</h1>
-      <table className="w-full bg-white rounded shadow overflow-hidden">
-        <thead className="bg-yellow-500 text-white">
-          <tr>
-            <th className="p-4 text-left">Mobil</th>
-            <th className="p-4 text-left">Status</th>
-            <th className="p-4 text-left">Periode</th>
-            <th className="p-4">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {bookings.map((b) => (
-            <tr key={b.id} className="border-b border-gray-200 hover:bg-yellow-50">
-              <td className="p-4">{b.car}</td>
-              <td className="p-4">{b.status}</td>
-              <td className="p-4">{b.start} s/d {b.end}</td>
-              <td className="p-4 text-center">
-                {b.status === "Berjalan" ? (
-                  <button
-                    onClick={() => handleCancel(b.id)}
-                    className="text-red-600 hover:underline font-semibold"
-                  >
-                    Batalkan
-                  </button>
-                ) : (
-                  "-"
-                )}
-              </td>
-            </tr>
-          ))}
-          {bookings.length === 0 && (
+    <div className="max-w-5xl mx-auto p-8">
+      <h2 className="text-3xl font-bold mb-6">Booking Saya</h2>
+      {loading ? (
+        <p>Loading data booking...</p>
+      ) : (
+        <table className="w-full bg-white rounded shadow overflow-hidden">
+          <thead className="bg-yellow-400 text-white">
             <tr>
-              <td colSpan="4" className="text-center p-6 text-gray-600">
-                Belum ada booking.
-              </td>
+              <th className="p-4 text-left">ID</th>
+              <th className="p-4 text-left">Car ID</th>
+              <th className="p-4 text-left">Periode</th>
+              <th className="p-4 text-left">Total Harga</th>
+              <th className="p-4 text-left">Status</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {bookings.length ? (
+              bookings.map((b) => (
+                <tr key={b.id} className="border-b border-gray-100 hover:bg-yellow-50">
+                  <td className="p-4">{b.id}</td>
+                  <td className="p-4">{b.car_id}</td>
+                  <td className="p-4">
+                    {b.start_date} - {b.end_date}
+                  </td>
+                  <td className="p-4">Rp {b.total_price?.toLocaleString()}</td>
+                  <td className="p-4">{b.status}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="text-center p-8 text-gray-400">
+                  Belum ada booking.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };

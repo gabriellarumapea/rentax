@@ -1,68 +1,50 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-
-const initialCars = [
-  { id: 1, name: "Toyota Avanza", price: 350000, type: "MPV" },
-  { id: 2, name: "Honda Jazz", price: 450000, type: "Hatchback" },
-];
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AdminCars = () => {
-  const [cars, setCars] = useState(initialCars);
+  const [cars, setCars] = useState([]);
+  const navigate = useNavigate();
 
-  const handleDelete = (id) => {
-    if (window.confirm("Yakin ingin menghapus mobil ini?")) {
-      setCars(cars.filter((car) => car.id !== id));
-    }
-  };
+  useEffect(() => {
+    fetch("http://localhost:6543/api/cars", {
+      headers: {
+        "X-Role": "admin",
+      },
+    })
+      .then((res) => res.json())
+      .then(setCars)
+      .catch(console.error);
+  }, []);
 
   return (
-    <div className="min-h-screen p-8 bg-gray-50 font-sans max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Kelola Data Mobil</h1>
-      <Link
-        to="/admin/cars/add"
-        className="bg-yellow-500 text-white px-6 py-2 rounded shadow hover:bg-yellow-600 mb-6 inline-block"
+    <div className="p-6 max-w-5xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">Kelola Mobil</h1>
+      <button
+        onClick={() => navigate("/admin/add-car")}
+        className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded mb-4"
       >
-        Tambah Mobil Baru
-      </Link>
-
-      <table className="w-full bg-white rounded shadow overflow-hidden">
-        <thead className="bg-yellow-500 text-white">
+        + Tambah Mobil
+      </button>
+      <table className="w-full bg-white rounded shadow">
+        <thead className="bg-yellow-400 text-white">
           <tr>
-            <th className="p-4 text-left">Nama Mobil</th>
-            <th className="p-4 text-left">Tipe</th>
-            <th className="p-4 text-left">Harga</th>
-            <th className="p-4">Aksi</th>
+            <th className="p-4 text-left">Nama</th>
+            <th className="p-4 text-left">Brand</th>
+            <th className="p-4 text-left">Tahun</th>
+            <th className="p-4 text-left">Harga/Hari</th>
+            <th className="p-4 text-left">Status</th>
           </tr>
         </thead>
         <tbody>
           {cars.map((car) => (
-            <tr key={car.id} className="border-b border-gray-200 hover:bg-yellow-50">
+            <tr key={car.id} className="border-b hover:bg-yellow-50">
               <td className="p-4">{car.name}</td>
-              <td className="p-4">{car.type}</td>
-              <td className="p-4">Rp{car.price.toLocaleString()}</td>
-              <td className="p-4 space-x-2 text-center">
-                <Link
-                  to={`/admin/cars/edit/${car.id}`}
-                  className="text-yellow-600 hover:underline font-semibold"
-                >
-                  Edit
-                </Link>
-                <button
-                  onClick={() => handleDelete(car.id)}
-                  className="text-red-600 hover:underline font-semibold"
-                >
-                  Hapus
-                </button>
-              </td>
+              <td className="p-4">{car.brand}</td>
+              <td className="p-4">{car.year}</td>
+              <td className="p-4">Rp {car.price_per_day?.toLocaleString()}</td>
+              <td className="p-4">{car.status}</td>
             </tr>
           ))}
-          {cars.length === 0 && (
-            <tr>
-              <td colSpan="4" className="text-center p-6 text-gray-600">
-                Tidak ada data mobil.
-              </td>
-            </tr>
-          )}
         </tbody>
       </table>
     </div>

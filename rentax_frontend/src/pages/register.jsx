@@ -1,9 +1,7 @@
 import React, { useState, useContext } from "react";
-import { AuthContext } from "../authcontext";
 import { useNavigate } from "react-router-dom";
 
 const Register = () => {
-  const { login } = useContext(AuthContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
