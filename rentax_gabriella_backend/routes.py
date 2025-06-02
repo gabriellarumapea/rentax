@@ -1,3 +1,6 @@
 def includeme(config):
-    config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('home', '/')
+    config.add_route('cars', '/api/cars')
+    config.add_route('car_detail', '/api/cars/{id}')
+    config.add_route('bookings', '/api/bookings')
+    config.add_route('booking_detail', '/api/bookings/{id}')
