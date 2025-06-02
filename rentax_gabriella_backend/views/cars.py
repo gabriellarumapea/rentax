@@ -85,3 +85,7 @@ def delete_car(request):
         return HTTPNotFound()
     DBSession.delete(car)
     return {"message": "Car deleted"}
+
+def includeme(config):
+    config.add_route('cars', '/api/cars')
+    config.add_route('car_detail', '/api/cars/{id}')

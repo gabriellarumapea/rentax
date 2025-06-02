@@ -9,10 +9,13 @@ def main(global_config, **settings):
     Base.metadata.bind = engine
 
     config = Configurator(settings=settings)
+    config.add_static_view(name='static', path='rentax_gabriella_backend:static')
     config.include('pyramid_jinja2')
     config.include('.routes')
     config.include('.models')
-    config.include('.views')
+    config.include('.views.default')
+    config.include('.views.cars')
+    config.include('.views.bookings')
 
     config.scan()
     return config.make_wsgi_app()

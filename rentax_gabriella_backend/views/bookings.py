@@ -91,3 +91,7 @@ def delete_booking(request):
         return HTTPNotFound()
     DBSession.delete(booking)
     return {"message": "Booking deleted"}
+
+def includeme(config):
+    config.add_route('bookings', '/api/bookings')
+    config.add_route('booking_detail', '/api/bookings/{id}')

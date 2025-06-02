@@ -4,8 +4,10 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from .. import models
 
+def includeme(config):
+    pass
 
-@view_config(route_name='home', renderer='rentax_gabriella:templates/mytemplate.jinja2')
+@view_config(route_name='home', renderer='rentax_gabriella_backend:templates/mytemplate.jinja2')
 def my_view(request):
     try:
         query = request.dbsession.query(models.MyModel)
